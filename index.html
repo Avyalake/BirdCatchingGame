@@ -373,13 +373,13 @@
                 birdSpeed: 4.3,
                 spawnRate: 0.03,
                 basketSpeed: 1.3,
-                description: "Bird Speed: 3.9 - Very fast birds! (10% ��, 40% 🔵, 50% 💗)"
+                description: "Bird Speed: 3.9 - Very fast birds! (10% 🌈, 40% 🔵, 50% 💗)"
             },
             crazy: {
                 birdSpeed: 4.4,
                 spawnRate: 0.035,
                 basketSpeed: 1.2,
-                description: "Bird Speed: 4.4 - CRAZY FAST! (15% ��, 40% 🔵, 45% 💗)"
+                description: "Bird Speed: 4.4 - CRAZY FAST! (15% 🌈, 40% 🔵, 45% 💗)"
             }
         };
 
@@ -634,6 +634,169 @@
         window.addEventListener('offline', () => {
             alert('You are offline! The game will continue to work, but you might want to check your connection.');
         });
+
+        // Mobile detection and control setup
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            // Modify game container for mobile
+            const gameContainer = document.getElementById('game-container');
+            gameContainer.style.touchAction = 'none'; // Prevent default touch actions
+
+            // Add mobile control buttons
+            const mobileControls = document.createElement('div');
+            mobileControls.className = 'mobile-controls';
+            mobileControls.innerHTML = `
+                <div class="control-left">◀</div>
+                <div class="control-right">▶</div>
+            `;
+            document.body.appendChild(mobileControls);
+
+            // Add mobile styles
+            const mobileStyles = document.createElement('style');
+            mobileStyles.textContent = `
+                .mobile-controls {
+                    position: fixed;
+                    bottom: 120px;
+                    left: 0;
+                    right: 0;
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 20px;
+                    z-index: 1000;
+                }
+
+                .control-left, .control-right {
+                    width: 80px;
+                    height: 80px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 40px;
+                    color: white;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                    user-select: none;
+                    -webkit-user-select: none;
+                }
+
+                .control-active {
+                    background: rgba(255, 255, 255, 0.5);
+                    transform: scale(1.1);
+                }
+
+                .basket {
+                    bottom: 200px !important; /* Move baskets up on mobile */
+                }
+
+                /* Adjust game container for mobile */
+                #game-container {
+                    touch-action: none;
+                    -webkit-touch-callout: none;
+                    -webkit-user-select: none;
+                    user-select: none;
+                }
+
+                /* Adjust difficulty buttons for mobile */
+                .difficulty-btn {
+                    padding: 20px 30px;
+                    margin: 10px;
+                    font-size: 18px;
+                }
+
+                /* Adjust scoreboard for mobile */
+                .scoreboard {
+                    font-size: 18px;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                    padding: 10px;
+                }
+
+                #turn-display {
+                    font-size: 18px;
+                    padding: 8px 15px;
+                }
+            `;
+            document.head.appendChild(mobileStyles);
+
+            // Mobile touch controls
+            const leftButton = document.querySelector('.control-left');
+            const rightButton = document.querySelector('.control-right');
+
+            // Touch handlers for left button
+            leftButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                leftButton.classList.add('control-active');
+                if (currentPlayer === 1) {
+                    player1Keys.left = true;
+                } else {
+                    player2Keys.left = true;
+                }
+            });
+
+            leftButton.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                leftButton.classList.remove('control-active');
+                if (currentPlayer === 1) {
+                    player1Keys.left = false;
+                } else {
+                    player2Keys.left = false;
+                }
+            });
+
+            // Touch handlers for right button
+            rightButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                rightButton.classList.add('control-active');
+                if (currentPlayer === 1) {
+                    player1Keys.right = true;
+                } else {
+                    player2Keys.right = true;
+                }
+            });
+
+            rightButton.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                rightButton.classList.remove('control-active');
+                if (currentPlayer === 1) {
+                    player1Keys.right = false;
+                } else {
+                    player2Keys.right = false;
+                }
+            });
+
+            // Prevent default touch actions
+            document.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            }, { passive: false });
+
+            // Update game instructions for mobile
+            const instructions = document.querySelector('.instructions');
+            if (instructions) {
+                instructions.innerHTML = `
+                    <h3>How to Play:</h3>
+                    <div class="controls">
+                        <div class="player-controls">
+                            <p><strong>Both Players:</strong> Use the arrow buttons at the bottom</p>
+                            <p>Left and right buttons to move the basket</p>
+                        </div>
+                        <div class="bird-points">
+                            <p>🌈 Rainbow Bird: +25 points</p>
+                            <p>🔵 Blue Bird: +3 points</p>
+                            <p>💗 Pink Bird: -10 points</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Update basket movement speed for mobile
+        if (isMobile) {
+            Object.keys(difficultySettings).forEach(difficulty => {
+                difficultySettings[difficulty].basketSpeed *= 1.5; // Increase basket speed for mobile
+            });
+        }
     </script>
 </body>
 </html>
