@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bird Catching Game</title>
+    <style>
+        
+        body {
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: rgb(3, 186, 246);
+        }
+
+        #game-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .scoreboard {
+            position: fixed;
+            top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 24px;
+            z-index: 100;
+        }
+
+        #turn-display {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 24px;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        #turn-display.warning {
+            background: #FF4444;
+            color: white;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .player-score {
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+
+        #player1-score { background: #FFB6C1; }
+        #player2-score { background: #ADD8E6; }
+
+        .basket {
+            width: 80px;
+            height: 80px;
+            position: absolute;
+            bottom: 20px;
+            border: 6px solid;
+            border-bottom: 12px solid;
+            border-radius: 0 0 50% 50%;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        #basket1 {
+            left: 25%;
+            border-color: #FF69B4;
+            background: #FFB6C1;
+        }
+
+        #basket2 {
+            right: 25%;
+            border-color: #4169E1;
+            background: #ADD8E6;
+        }
+
+        .bird {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .rainbow-bird {
+            background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+        }
+
+        .blue-bird { background: blue; }
+        .pink-bird { 
+            background: pink;
+            box-shadow: 0 0 10px red;
+        }
+
+        .active-player {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px gold;
+        }
+
+        .inactive-player {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        #turn-announcement {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 30px 60px;
+            border-radius: 15px;
+            font-size: 36px;
+            z-index: 1000;
+            display: none;
+            text-align: center;
+        }
+
+        #start-screen, #game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 2000;
+        }
+
+        #game-over {
+            display: none;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .difficulty-select {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .difficulty-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .difficulty-btn {
+            min-width: 120px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .difficulty-btn small {
+            display: block;
+            font-size: 14px;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+
+        .difficulty-btn.easy {
+            background: #98FB98;
+            color: #006400;
+        }
+
+        .difficulty-btn.normal {
+            background: #FFD700;
+            color: #8B4513;
+        }
+
+        .difficulty-btn.hard {
+            background: #FFB6C1;
+            color: #8B0000;
+        }
+
+        .difficulty-btn.veryhard {
+            background: #FF4444;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .difficulty-btn.selected {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        .difficulty-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Add pulsing effect for Very Hard button */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .difficulty-btn.veryhard {
+            animation: pulse 2s infinite;
+        }
+
+        .difficulty-btn.veryhard:hover {
+            animation: none;
+        }
+
+        .difficulty-btn.veryhard.selected {
+            animation: none;
+            transform: scale(1.1);
+        }
+
+        #difficulty-description {
+            font-size: 16px;
+            color: #FFD700;
+            margin-top: 10px;
+            min-height: 40px;
+        }
+
+        #start-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        /* Add styles for the Crazy difficulty button */
+        .difficulty-btn.crazy {
+            background: linear-gradient(45deg, #FF0000, #FF8C00);
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <div id="start-screen">
+        <h1>Bird Catching Game</h1>
+        <div class="difficulty-select">
+            <h3>Select Difficulty to Play:</h3>
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn easy" onclick="setDifficultyAndStart('easy')">
+                    Easy<br><small>Speed: 1.3</small>
+                </button>
+                <button class="difficulty-btn normal" onclick="setDifficultyAndStart('normal')">
+                    Normal<br><small>Speed: 2.0</small>
+                </button>
+                <button class="difficulty-btn hard" onclick="setDifficultyAndStart('hard')">
+                    Hard<br><small>Speed: 3.1</small>
+                </button>
+                <button class="difficulty-btn veryhard" onclick="setDifficultyAndStart('veryhard')">
+                    Very Hard<br><small>Speed: 3.9</small>
+                </button>
+                <button class="difficulty-btn crazy" onclick="setDifficultyAndStart('crazy')">
+                    🔥 CRAZY 🔥<br><small>Speed: 4.4</small>
+                </button>
+            </div>
+        </div>
+        <div class="instructions">
+            <h3>How to Play:</h3>
+            <div class="controls">
+                <div class="player-controls">
+                    <p><strong>Player 1:</strong> Use A/D keys</p>
+                    <p><strong>Player 2:</strong> Use Left/Right arrows</p>
+                </div>
+                <div class="bird-points">
+                    <p>🌈 Rainbow Bird: +25 points</p>
+                    <p>🔵 Blue Bird: +3 points</p>
+                    <p>💗 Pink Bird: -10 points</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="scoreboard">
+        <div id="player1-score">Player 1: 0</div>
+        <div id="turn-display">Player 1's Turn: 60s</div>
+        <div id="player2-score">Player 2: 0</div>
+    </div>
+
+    <div id="game-container">
+        <div id="basket1" class="basket"></div>
+        <div id="basket2" class="basket"></div>
+    </div>
+
+    <div id="turn-announcement"></div>
+
+    <div id="game-over">
+        <h2>Game Over!</h2>
+        <p id="final-scores"></p>
+        <p id="winner"></p>
+        <button onclick="location.reload()">Play Again</button>
+    </div>
+
+    <script>
+        const gameContainer = document.getElementById('game-container');
+        const basket1 = document.getElementById('basket1');
+        const basket2 = document.getElementById('basket2');
+        const player1Score = document.getElementById('player1-score');
+        const player2Score = document.getElementById('player2-score');
+        const turnDisplay = document.getElementById('turn-display');
+        const turnAnnouncement = document.getElementById('turn-announcement');
+        const gameOver = document.getElementById('game-over');
+
+        let gameActive = false;
+        let currentPlayer = 1;
+        let timeLeft = 120;
+        let scores = { player1: 0, player2: 0 };
+        let birds = [];
+        let player1Keys = { left: false, right: false };
+        let player2Keys = { left: false, right: false };
+        let gameDifficulty = '';
+        const difficultySettings = {
+            easy: {
+                birdSpeed: 1.3,
+                spawnRate: 0.015,
+                basketSpeed: 2.0,
+                description: "Bird Speed: 1.3 - More good birds (25% 🌈, 55% 🔵, 20% 💗)"
+            },
+            normal: {
+                birdSpeed: 2.0,
+                spawnRate: 0.02,
+                basketSpeed: 1.7,
+                description: "Bird Speed: 2.0 - Balanced birds (20% 🌈, 50% 🔵, 30% 💗)"
+            },
+            hard: {
+                birdSpeed: 3.1,
+                spawnRate: 0.025,
+                basketSpeed: 1.5,
+                description: "Bird Speed: 3.1 - More bad birds (15% 🌈, 45% 🔵, 40% 💗)"
+            },
+            veryhard: {
+                birdSpeed: 4.3,
+                spawnRate: 0.03,
+                basketSpeed: 1.3,
+                description: "Bird Speed: 3.9 - Very fast birds! (10% ��, 40% 🔵, 50% 💗)"
+            },
+            crazy: {
+                birdSpeed: 4.4,
+                spawnRate: 0.035,
+                basketSpeed: 1.2,
+                description: "Bird Speed: 4.4 - CRAZY FAST! (15% ��, 40% 🔵, 45% 💗)"
+            }
+        };
+
+        function createBird() {
+            const bird = document.createElement('div');
+            bird.className = 'bird';
+            const settings = difficultySettings[gameDifficulty];
+            const type = Math.random();
+            
+            // Adjust probabilities based on difficulty
+            let rainbowThreshold, blueThreshold;
+            switch(gameDifficulty) {
+                case 'easy':
+                    rainbowThreshold = 0.25;  // 25% rainbow
+                    blueThreshold = 0.8;      // 55% blue, 20% pink
+                    break;
+                case 'normal':
+                    rainbowThreshold = 0.2;   // 20% rainbow
+                    blueThreshold = 0.7;      // 50% blue, 30% pink
+                    break;
+                case 'hard':
+                    rainbowThreshold = 0.15;  // 15% rainbow
+                    blueThreshold = 0.6;      // 45% blue, 40% pink
+                    break;
+                case 'veryhard':
+                    rainbowThreshold = 0.1;   // 10% rainbow
+                    blueThreshold = 0.5;      // 40% blue, 50% pink
+                    break;
+                case 'crazy':
+                    rainbowThreshold = 0.15;  // 15% rainbow
+                    blueThreshold = 0.55;     // 40% blue, 45% pink
+                    break;
+            }
+            
+            if (type < rainbowThreshold) {
+                bird.classList.add('rainbow-bird');
+                bird.points = 25;
+                if (gameDifficulty === 'crazy') {
+                    bird.style.filter = 'brightness(1.5) contrast(1.2)';
+                    bird.style.boxShadow = '0 0 15px gold';
+                }
+            } else if (type < blueThreshold) {
+                bird.classList.add('blue-bird');
+                bird.points = 3;
+                if (gameDifficulty === 'crazy') {
+                    bird.style.filter = 'brightness(1.2)';
+                    bird.style.boxShadow = '0 0 10px blue';
+                }
+            } else {
+                bird.classList.add('pink-bird');
+                bird.points = -10;
+                if (gameDifficulty === 'crazy') {
+                    bird.style.filter = 'brightness(1.2)';
+                    bird.style.boxShadow = '0 0 10px red';
+                }
+            }
+
+            bird.style.left = Math.random() * (gameContainer.offsetWidth - 40) + 'px';
+            bird.style.top = '0px';
+            gameContainer.appendChild(bird);
+            return bird;
+        }
+
+        function updateGame() {
+            if (!gameActive) return;
+
+            const settings = difficultySettings[gameDifficulty];
+
+            // Create birds with difficulty-based spawn rate
+            if (Math.random() < settings.spawnRate) {
+                birds.push(createBird());
+            }
+
+            // Update birds with exact speeds
+            birds.forEach((bird, index) => {
+                const top = parseFloat(bird.style.top) || 0;
+                bird.style.top = (top + settings.birdSpeed) + 'px';
+
+                const birdRect = bird.getBoundingClientRect();
+                const currentBasket = currentPlayer === 1 ? basket1 : basket2;
+                const basketRect = currentBasket.getBoundingClientRect();
+
+                if (checkCollision(birdRect, basketRect)) {
+                    if (currentPlayer === 1) {
+                        scores.player1 += bird.points;
+                        player1Score.textContent = `Player 1: ${scores.player1}`;
+                    } else {
+                        scores.player2 += bird.points;
+                        player2Score.textContent = `Player 2: ${scores.player2}`;
+                    }
+                    bird.remove();
+                    birds.splice(index, 1);
+                } else if (top > gameContainer.offsetHeight) {
+                    bird.remove();
+                    birds.splice(index, 1);
+                }
+            });
+
+            // Handle basket movement
+            if (currentPlayer === 1) {
+                if (player1Keys.left && parseInt(basket1.style.left || 25) > 0) {
+                    basket1.style.left = (parseInt(basket1.style.left || 25) - settings.basketSpeed) + '%';
+                }
+                if (player1Keys.right && parseInt(basket1.style.left || 25) < 90) {
+                    basket1.style.left = (parseInt(basket1.style.left || 25) + settings.basketSpeed) + '%';
+                }
+            } else {
+                if (player2Keys.left && parseInt(basket2.style.right || 25) < 90) {
+                    basket2.style.right = (parseInt(basket2.style.right || 25) + settings.basketSpeed) + '%';
+                }
+                if (player2Keys.right && parseInt(basket2.style.right || 25) > 0) {
+                    basket2.style.right = (parseInt(basket2.style.right || 25) - settings.basketSpeed) + '%';
+                }
+            }
+
+            requestAnimationFrame(updateGame);
+        }
+
+        function checkCollision(rect1, rect2) {
+            return !(rect1.right < rect2.left || 
+                    rect1.left > rect2.right || 
+                    rect1.bottom < rect2.top || 
+                    rect1.top > rect2.bottom);
+        }
+
+        function setDifficultyAndStart(level) {
+            gameDifficulty = level;
+            gameActive = true;
+            timeLeft = 240; // Reset timer to 4 minutes (240 seconds)
+            currentPlayer = 1;
+            scores = { player1: 0, player2: 0 };
+            
+            // Hide start screen
+            document.getElementById('start-screen').style.display = 'none';
+            
+            // Reset scores display
+            document.getElementById('player1-score').textContent = 'Player 1: 0';
+            document.getElementById('player2-score').textContent = 'Player 2: 0';
+            
+            // Start the game timer
+            startGameTimer();
+            
+            // Start game loop
+            updateGame();
+        }
+
+        // Separate timer function for better management
+        function startGameTimer() {
+            const timer = setInterval(() => {
+                if (!gameActive) {
+                    clearInterval(timer);
+                    return;
+                }
+
+                timeLeft--;
+                
+                // Update timer display
+                const timeInTurn = currentPlayer === 1 ? timeLeft - 120 : timeLeft;
+                document.getElementById('turn-display').textContent = 
+                    `Player ${currentPlayer}'s Turn: ${formatTime(timeInTurn)}`;
+                
+                // Handle player switch at halfway point
+                if (timeLeft === 120) {
+                    currentPlayer = 2;
+                    clearAllBirds();
+                    updatePlayerHighlight();
+                    showTurnAnnouncement();
+                }
+                
+                // Check for game over
+                if (timeLeft <= 0) {
+                    gameActive = false;
+                    showGameOver();
+                    clearInterval(timer);
+                }
+            }, 1000);
+        }
+
+        // Format time function
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Show game over screen
+        function showGameOver() {
+            const gameOver = document.getElementById('game-over');
+            gameOver.style.display = 'block';
+            document.getElementById('final-scores').textContent = 
+                `Player 1: ${scores.player1} | Player 2: ${scores.player2}`;
+            document.getElementById('winner').textContent = 
+                scores.player1 > scores.player2 ? 'Player 1 Wins!' :
+                scores.player2 > scores.player1 ? 'Player 2 Wins!' : 
+                "It's a Tie!";
+        }
+
+        // Update turn announcement
+        function showTurnAnnouncement() {
+            const turnAnnouncement = document.getElementById('turn-announcement');
+            turnAnnouncement.innerHTML = `
+                <h2>Player ${currentPlayer}'s Turn!</h2>
+                <p>You have 2 minutes</p>
+            `;
+            turnAnnouncement.style.display = 'block';
+            setTimeout(() => {
+                turnAnnouncement.style.display = 'none';
+            }, 2000);
+        }
+
+        // Update player highlight
+        function updatePlayerHighlight() {
+            const basket1 = document.getElementById('basket1');
+            const basket2 = document.getElementById('basket2');
+            
+            if (currentPlayer === 1) {
+                basket1.classList.add('active-player');
+                basket1.classList.remove('inactive-player');
+                basket2.classList.add('inactive-player');
+                basket2.classList.remove('active-player');
+            } else {
+                basket2.classList.add('active-player');
+                basket2.classList.remove('inactive-player');
+                basket1.classList.add('inactive-player');
+                basket1.classList.remove('active-player');
+            }
+        }
+
+        function clearAllBirds() {
+            birds.forEach(bird => bird.remove());
+            birds = [];
+        }
+
+        document.addEventListener('keydown', (e) => {
+            switch(e.key.toLowerCase()) {
+                case 'a': player1Keys.left = true; break;
+                case 'd': player1Keys.right = true; break;
+                case 'arrowleft': player2Keys.left = true; break;
+                case 'arrowright': player2Keys.right = true; break;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            switch(e.key.toLowerCase()) {
+                case 'a': player1Keys.left = false; break;
+                case 'd': player1Keys.right = false; break;
+                case 'arrowleft': player2Keys.left = false; break;
+                case 'arrowright': player2Keys.right = false; break;
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            alert('You are offline! The game will continue to work, but you might want to check your connection.');
+        });
+    </script>
+</body>
+</html>
