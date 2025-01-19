@@ -667,14 +667,14 @@
                 }
 
                 .control-left, .control-right {
-                    width: 80px;
-                    height: 80px;
+                    width: 120px;
+                    height: 120px;
                     background: rgba(255, 255, 255, 0.3);
                     border-radius: 50%;
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    font-size: 40px;
+                    font-size: 60px;
                     color: white;
                     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
                     user-select: none;
@@ -687,10 +687,9 @@
                 }
 
                 .basket {
-                    bottom: 200px !important; /* Move baskets up on mobile */
+                    bottom: 200px !important;
                 }
 
-                /* Adjust game container for mobile */
                 #game-container {
                     touch-action: none;
                     -webkit-touch-callout: none;
@@ -698,24 +697,30 @@
                     user-select: none;
                 }
 
-                /* Adjust difficulty buttons for mobile */
                 .difficulty-btn {
                     padding: 20px 30px;
                     margin: 10px;
-                    font-size: 18px;
+                    font-size: 24px;
                 }
 
-                /* Adjust scoreboard for mobile */
                 .scoreboard {
-                    font-size: 18px;
+                    font-size: 24px;
                     flex-wrap: wrap;
                     gap: 10px;
                     padding: 10px;
                 }
 
                 #turn-display {
-                    font-size: 18px;
+                    font-size: 24px;
                     padding: 8px 15px;
+                }
+
+                .instructions {
+                    font-size: 20px;
+                }
+
+                .instructions h3 {
+                    font-size: 28px;
                 }
             `;
             document.head.appendChild(mobileStyles);
