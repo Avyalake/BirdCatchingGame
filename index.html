@@ -658,24 +658,24 @@
             mobileStyles.textContent = `
                 .mobile-controls {
                     position: fixed;
-                    bottom: 120px;
+                    bottom: 60px;
                     left: 0;
                     right: 0;
                     display: flex;
                     justify-content: space-between;
-                    padding: 20px;
+                    padding: 10px;
                     z-index: 1000;
                 }
 
                 .control-left, .control-right {
-                    width: 120px;
-                    height: 120px;
+                    width: 60px;
+                    height: 60px;
                     background: rgba(255, 255, 255, 0.3);
                     border-radius: 50%;
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    font-size: 60px;
+                    font-size: 30px;
                     color: white;
                     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
                     user-select: none;
@@ -688,40 +688,44 @@
                 }
 
                 .basket {
-                    bottom: 200px !important;
+                    width: 40px !important;
+                    height: 40px !important;
+                    bottom: 100px !important;
                 }
 
-                #game-container {
-                    touch-action: none;
-                    -webkit-touch-callout: none;
-                    -webkit-user-select: none;
-                    user-select: none;
+                .bird {
+                    width: 30px !important;
+                    height: 30px !important;
                 }
 
                 .difficulty-btn {
-                    padding: 20px 30px;
-                    margin: 10px;
-                    font-size: 24px;
+                    padding: 10px 15px;
+                    margin: 5px;
+                    font-size: 12px;
                 }
 
                 .scoreboard {
-                    font-size: 24px;
+                    font-size: 12px;
                     flex-wrap: wrap;
-                    gap: 10px;
-                    padding: 10px;
+                    gap: 5px;
+                    padding: 5px;
                 }
 
                 #turn-display {
-                    font-size: 24px;
-                    padding: 8px 15px;
+                    font-size: 12px;
+                    padding: 4px 8px;
                 }
 
                 .instructions {
-                    font-size: 20px;
+                    font-size: 10px;
                 }
 
                 .instructions h3 {
-                    font-size: 28px;
+                    font-size: 14px;
+                }
+
+                .difficulty-btn small {
+                    font-size: 10px;
                 }
             `;
             document.head.appendChild(mobileStyles);
